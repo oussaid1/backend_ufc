@@ -18,42 +18,28 @@ def respond(request,board_id):
     return render(request,"responder/index.html",{'data':data})
 
 
-#@api_view(['POST'])
-#def create_user(request):
- #   if request.method == 'POST':
-  #      serializer = UsersSerialiser(data=request.data)
-   #     if serializer.is_valid():
-    #        serializer.save()
-     #   return Response(serializer.data,status=status.HTTP_201_CREATED)   
-    #return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)    
 
+# this is the view for the delete function
+@api_view('DELETE')
+#@permission_classes([IsAuthenticated,])
+def delete(request,board_id):
+    data = User.objects.get(username = board_id)
+    data = data.Users
+    data.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-@api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated,])
-def upd_add_del(request,board_id):
-    try:
-        data_user = User.objects.get(username = board_id)
-        data = data_user.users
-    except data.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)     
-
-    if request.method == 'GET':
-        ser = UsersSerialiser(data)
-        return Response(ser.data)   
-
-    if request.method == 'PUT':
-        ser = UsersSerialiser(data,data=request.data)
+# this is the view for the update function
+@api_view('PUT')
+def register(request,board_id):
+        data = User.objects.get(username = board_id)
+        data = data.Users
+        ser = RegistrationSerializer(data=request.data)
         if ser.is_valid():
             ser.save()
-            return Response(ser.data)
-        return Response(ser.errors,status=status.HTTP_400_BAD_REQUEST)   
+            return Response(ser.data,status=status.HTTP_201_CREATED)
+        return Response(ser.errors,status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'DELETE':
-        data.delete()   
-    return Response(ser.data,status=status.HTTP_204_NO_CONTENT)        
-
-
+# this is the view for the signup
 @api_view(['POST', ])
 def registration_view(request):
     if request.method == 'POST':
@@ -69,16 +55,6 @@ def registration_view(request):
         else:
             data = serializer.errors
         return Response(data)
-
-
-#class LoginAPI(KnoxLoginView):
- #   permission_classes = (permissions.AllowAny,)
-  #  def post(self, request, format=None):
-   #     serializer = AuthTokenSerializer(data=request.data)
-    #    serializer.is_valid(raise_exception=True)
-     #   user = serializer.validated_data['user']
-      #  login(request, user)
-       # return super(LoginAPI, self).post(request, format=None)
 
 
 
